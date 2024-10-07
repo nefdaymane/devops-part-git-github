@@ -4,12 +4,11 @@ import { Product, ProductDocument } from '../schema/product.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateProductDto } from '../dto/product/create-product.dto';
 import { Model } from 'mongoose';
-import { ProductStockState } from '../schema/product-stock-state.schema';
-import { Types } from 'mongoose';
 import {
   ProductCategory,
   ProductCategoryDocument,
 } from '../schema/product-category.schema';
+import { ProductStockState } from '../schema/product-stock-state.schema';
 import { UpdateProductDto } from '../dto/product/update-product.dto';
 import {
   generateErrorResponse,
@@ -25,6 +24,7 @@ export class ProductService {
     @InjectModel(ProductStockState.name)
     private productStockStateModel: Model<ProductStockState>,
   ) {}
+
 
   async createProduct(
     createProductDto: CreateProductDto,
@@ -55,6 +55,11 @@ export class ProductService {
 
     const product = new this.productModel(createProductDto);
     await product.save();
+
+      return generateSuccessResponse(
+        product.toObject(),
+        'Product created successfully',
+      );
 
   }
 
@@ -91,6 +96,7 @@ export class ProductService {
       'Product found successfully',
     );
   }
+
 
   async updateProduct(
     name: string,
@@ -154,5 +160,6 @@ export class ProductService {
 
     return generateSuccessResponse(null, 'Products deleted successfully');
   }
+
 
 }
