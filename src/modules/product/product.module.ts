@@ -8,6 +8,7 @@ import { ProductCategoryController } from './controllers/product-category.contro
 import { ProductStockStateController } from './controllers/product-stock-state.controller';
 import { ProductStockStateService } from './services/product-stock-state.service';
 import { Module } from '@nestjs/common';
+import { ProductCategoryService } from "./services/product-category.service";
 
 @Module({
   imports: [
@@ -17,8 +18,12 @@ import { Module } from '@nestjs/common';
       { name: 'ProductStockState', schema: productStockStateSchema },
     ]),
   ],
-  controllers: [ProductController, ProductStockStateController,ProductCategoryController],
-  providers: [ProductService, ProductStockStateService, ProductStockStateService],
+  controllers: [
+    ProductController,
+    ProductStockStateController,
+    ProductCategoryController,
+  ],
+  providers: [ProductService, ProductCategoryService, ProductStockStateService],
   exports: [MongooseModule],
 })
 export class ProductModule {}
