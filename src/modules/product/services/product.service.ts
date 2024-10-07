@@ -6,6 +6,10 @@ import { CreateProductDto } from '../dto/product/create-product.dto';
 import { Model } from 'mongoose';
 import { ProductStockState } from '../schema/product-stock-state.schema';
 import { Types } from 'mongoose';
+import {
+  ProductCategory,
+  ProductCategoryDocument,
+} from '../schema/product-category.schema';
 import { UpdateProductDto } from '../dto/product/update-product.dto';
 import {
   generateErrorResponse,
@@ -20,7 +24,6 @@ export class ProductService {
     private productCategoryModel: Model<ProductCategoryDocument>,
     @InjectModel(ProductStockState.name)
     private productStockStateModel: Model<ProductStockState>,
-    private readonly orderItemService: OrderItemService,
   ) {}
 
   async createProduct(
@@ -53,22 +56,6 @@ export class ProductService {
     const product = new this.productModel(createProductDto);
     await product.save();
 
-    for (const orderItemDto of createProductDto.orderItems) {
-      const orderItemData: CreateOrderItemDto = {
-        ...orderItemDto,
-        product: product._id as Types.ObjectId,
-      };
-      const orderItemResponse =
-        await this.orderItemService.createOrderItem(orderItemData);
-      if (!orderItemResponse.success) {
-        return generateErrorResponse('Failed to create OrderItem');
-      }
-
-      return generateSuccessResponse(
-        product.toObject(),
-        'Product created successfully',
-      );
-    }
   }
 
   async findAll(): Promise<ApiResponse<Product[]>> {
@@ -105,5 +92,67 @@ export class ProductService {
     );
   }
 
-  
+  async updateProduct(
+    name: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<ApiResponse<Product>> {
+    const existingProduct = await this.productModel.findOne({
+      name,
+    });
+
+    if (!existingProduct) {
+      return generateErrorResponse('Product not found');
+    }
+
+    const productCategory = await this.productCategoryModel.findOne({
+      name: updateProductDto.productCategoryName,
+    });
+
+    if (!productCategory) {
+      return generateErrorResponse('productCategory not found');
+    }
+
+    const productStockState = await this.productStockStateModel.findOne({
+      name: updateProductDto.productStockStateName,
+    });
+
+    if (!productStockState) {
+      return generateErrorResponse('productStockState not found');
+    }
+
+    existingProduct.set(updateProductDto);
+    await existingProduct.save();
+
+    return generateSuccessResponse(
+      existingProduct.toObject(),
+      'Product updated successfully',
+    );
+  }
+
+  async deleteProductById(id: string): Promise<ApiResponse<Product>> {
+    const product = await this.productModel.findById({
+      id,
+    });
+
+    if (!product) {
+      return generateErrorResponse('Product not found');
+    }
+
+    await this.productModel.findByIdAndDelete(id);
+
+    return generateSuccessResponse(null, 'Product deleted successfully');
+  }
+
+  async deleteManyProductsById(ids: string[]): Promise<ApiResponse<void>> {
+    const products = await this.productModel.find({ _id: { $in: ids } });
+
+    if (!products && products.length === 0) {
+      return generateErrorResponse('Products not found');
+    }
+
+    await this.productModel.deleteMany({ _id: { $in: ids } });
+
+    return generateSuccessResponse(null, 'Products deleted successfully');
+  }
+
 }
