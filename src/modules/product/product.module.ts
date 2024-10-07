@@ -7,6 +7,7 @@ import { ProductController } from './controllers/product.controller';
 import { ProductCategoryController } from './controllers/product-category.controller';
 import { ProductStockStateController } from './controllers/product-stock-state.controller';
 import { ProductStockStateService } from './services/product-stock-state.service';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -16,8 +17,8 @@ import { ProductStockStateService } from './services/product-stock-state.service
       { name: 'ProductStockState', schema: productStockStateSchema },
     ]),
   ],
-  controllers: [ProductController,ProductStockStateController,ProductCategoryController],
-  providers: [ProductService,ProductStockStateService, ProductStockStateService],
+  controllers: [ProductController, ProductStockStateController,ProductCategoryController],
+  providers: [ProductService, ProductStockStateService, ProductStockStateService],
   exports: [MongooseModule],
 })
 export class ProductModule {}
