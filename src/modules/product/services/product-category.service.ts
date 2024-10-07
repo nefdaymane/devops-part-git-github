@@ -62,14 +62,23 @@ export class ProductCategoryService {
   }
 
   async findByName(name: string): Promise<ApiResponse<ProductCategory>> {
+  async deleteProductCategoryById(id: string): Promise<ApiResponse<void>> {
     const productCategory = await this.productCategoryModel
+      .findByIdAndDelete(id)
       .findOne({ name })
       .exec();
+
     if (!productCategory) {
+      return {
+        success: false,
+        message: 'Product Category not found',
+      };
       return generateErrorResponse('Product Category not found');
     }
 
     return generateSuccessResponse(
+      null,
+      'Product Category deleted successfully',
       productCategory.toObject(),
       'Product Category fetched successfully',
     );
@@ -81,16 +90,25 @@ export class ProductCategoryService {
   ) {
     const existingProductCategory = await this.productCategoryModel.findOne({
       name,
+  async deleteManyProductCategoriesById(
+    ids: string[],
+  ): Promise<ApiResponse<void>> {
+    const productCategories = await this.productCategoryModel.deleteMany({
+      _id: { $in: ids },
     });
 
     if (!existingProductCategory) {
       return generateErrorResponse('Product Category not found');
+    if (productCategories.deletedCount === 0) {
+      return generateErrorResponse('Product Categories not found');
     }
 
     existingProductCategory.set(updateProductCategoryDto);
     await existingProductCategory.save();
 
     return generateSuccessResponse(
+      null,
+      'Product Categories deleted successfully',
       existingProductCategory.toObject(),
       'Product Category updated successfully',
     );
