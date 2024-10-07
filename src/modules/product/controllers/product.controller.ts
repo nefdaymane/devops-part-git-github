@@ -34,14 +34,6 @@ export class ProductController {
   findByName(@Param('name') name: string) {
     return this.productService.findByName(name);
   }
-}
-import { Body, Controller, Delete, Param, Put } from '@nestjs/common';
-import { UpdateProductDto } from '../dto/product/update-product.dto';
-import { ProductService } from '../services/product.service';
-
-@Controller('product')
-export class ProductController {
-  constructor(private readonly productService: ProductService) {}
 
   @Put('name/:name')
   update(

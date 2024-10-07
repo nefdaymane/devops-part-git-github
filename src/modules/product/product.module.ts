@@ -1,3 +1,4 @@
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { productSchema } from './schema/product.schema';
 import { productCategorySchema } from './schema/product-category.schema';
