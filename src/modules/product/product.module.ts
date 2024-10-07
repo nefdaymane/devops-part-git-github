@@ -5,6 +5,8 @@ import { productCategorySchema } from './schema/product-category.schema';
 import { productStockStateSchema } from './schema/product-stock-state.schema';
 import { ProductService } from './services/product.service';
 import { ProductController } from './controllers/product.controller';
+import { ProductStockStateController } from './controllers/product-stock-state.controller';
+import { ProductStockStateService } from './services/product-stock-state.service';
 
 @Module({
   imports: [
@@ -14,8 +16,8 @@ import { ProductController } from './controllers/product.controller';
       { name: 'ProductStockState', schema: productStockStateSchema },
     ]),
   ],
-  controllers: [ProductController],
-  providers: [ProductService],
+  controllers: [ProductController,ProductStockStateController],
+  providers: [ProductService,ProductStockStateService],
   exports: [MongooseModule],
 })
 export class ProductModule {}
